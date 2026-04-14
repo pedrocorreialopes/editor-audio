@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Áudio Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <header class="bg-gray-800 shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <h1 class="text-3xl font-bold text-center">
+                <i class="fas fa-music mr-3 text-blue-400"></i>
+                Editor de Áudio Online
+            </h1>
+            <p class="text-center text-gray-300 mt-2">Edite seus arquivos de áudio diretamente no navegador</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Upload Section -->
+        <section class="mb-8">
+            <div class="bg-gray-800 rounded-lg p-6 shadow-xl">
+                <h2 class="text-xl font-semibold mb-4">
+                    <i class="fas fa-upload mr-2"></i>
+                    Carregar Áudio
+                </h2>
+                <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-blue-400 transition-colors" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                    <p class="text-lg mb-2">Arraste seu arquivo de áudio aqui ou clique para selecionar</p>
+                    <p class="text-sm text-gray-400">Formatos suportados: MP3, WAV, OGG, M4A</p>
+                    <input type="file" id="audioFile" accept="audio/*" class="hidden">
+                    <button id="selectFile" class="mt-4 bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-folder-open mr-2"></i>
+                        Selecionar Arquivo
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audio Controls -->
+        <section id="audioControls" class="hidden mb-8">
+            <div class="bg-gray-800 rounded-lg p-6 shadow-xl">
+                <h2 class="text-xl font-semibold mb-4">
+                    <i class="fas fa-sliders-h mr-2"></i>
+                    Controles de Edição
+                </h2>
+                
+                <!-- Waveform Visualization -->
+                <div class="mb-6">
+                    <canvas id="waveform" class="w-full h-32 bg-gray-700 rounded-lg"></canvas>
+                </div>
+
+                <!-- Audio Player -->
+                <div class="mb-6">
+                    <audio id="audioPlayer" controls class="w-full"></audio>
+                </div>
+
+                <!-- Control Panels -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <!-- Volume Control -->
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium mb-2">
+                            <i class="fas fa-volume-up mr-1"></i>
+                            Volume
+                        </h3>
+                        <input type="range" id="volume" min="0" max="200" value="100" class="w-full">
+                        <span id="volumeValue" class="text-xs text-gray-400">100%</span>
+                    </div>
+
+                    <!-- Speed Control -->
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium mb-2">
+                            <i class="fas fa-tachometer-alt mr-1"></i>
+                            Velocidade
+                        </h3>
+                        <input type="range" id="speed" min="50" max="200" value="100" class="w-full">
+                        <span id="speedValue" class="text-xs text-gray-400">1.0x</span>
+                    </div>
+
+                    <!-- Pitch Control -->
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium mb-2">
+                            <i class="fas fa-wave-square mr-1"></i>
+                            Tom (Pitch)
+                        </h3>
+                        <input type="range" id="pitch" min="-12" max="12" value="0" class="w-full">
+                        <span id="pitchValue" class="text-xs text-gray-400">0 semitons</span>
+                    </div>
+
+                    <!-- Echo Control -->
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium mb-2">
+                            <i class="fas fa-circle-notch mr-1"></i>
+                            Eco
+                        </h3>
+                        <input type="range" id="echo" min="0" max="100" value="0" class="w-full">
+                        <span id="echoValue" class="text-xs text-gray-400">0%</span>
+                    </div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium mb-2">
+                            <i class="fas fa-filter mr-1"></i>
+                            Filtro High-pass
+                        </h3>
+                        <input type="range" id="highpass" min="20" max="2000" value="20" class="w-full">
+                        <span id="highpassValue" class="text-xs text-gray-400">20 Hz</span>
+                    </div>
+
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium mb-2">
+                            <i class="fas fa-filter mr-1"></i>
+                            Filtro Low-pass
+                        </h3>
+                        <input type="range" id="lowpass" min="1000" max="20000" value="20000" class="w-full">
+                        <span id="lowpassValue" class="text-xs text-gray-400">20000 Hz</span>
+                    </div>
+
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium mb-2">
+                            <i class="fas fa-balance-scale mr-1"></i>
+                            Balanço
+                        </h3>
+                        <input type="range" id="pan" min="-100" max="100" value="0" class="w-full">
+                        <span id="panValue" class="text-xs text-gray-400">Centro</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap gap-4">
+                    <button id="playOriginal" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-play mr-2"></i>
+                        Tocar Original
+                    </button>
+                    <button id="playProcessed" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-play mr-2"></i>
+                        Tocar Processado
+                    </button>
+                    <button id="resetAll" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-undo mr-2"></i>
+                        Resetar
+                    </button>
+                    <button id="downloadAudio" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-download mr-2"></i>
+                        Baixar Áudio
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audio Info -->
+        <section id="audioInfo" class="hidden">
+            <div class="bg-gray-800 rounded-lg p-6 shadow-xl">
+                <h2 class="text-xl font-semibold mb-4">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Informações do Áudio
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <strong>Duração:</strong> <span id="duration">--:--</span>
+                    </div>
+                    <div>
+                        <strong>Tamanho:</strong> <span id="fileSize">--</span>
+                    </div>
+                    <div>
+                        <strong>Taxa de Amostragem:</strong> <span id="sampleRate">--</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 mt-12 py-6">
+        <div class="container mx-auto px-4 text-center text-gray-400">
+            <p>&copy; 2024 Editor de Áudio Online. Processamento de áudio no seu navegador.</p>
+        </div>
+    </footer>
+
+    <script src="js/audioProcessor.js"></script>
+    <script src="js/visualizer.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
